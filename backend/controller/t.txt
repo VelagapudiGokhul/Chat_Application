@@ -1,0 +1,80 @@
+const User = require("../model/userSchema");
+const Message = require('../model/messageSchema'); 
+const cloudinary = require('../config/cloudinary');
+const { getReceiverSocketId, io } = require("../socket/socket");
+
+exports.allUsers = async (req, res) => {
+    try {
+        const userid = req.user._id;
+        const allusers = await User.find({ _id: { $ne : userid } }).select("-password");
+        return res.status(200).json({allusers});
+    } catch (e) {
+        return res.status(500).json({ message: "Internal Server Error", e });
+    }
+};
+
+exports.getMessages = async (req, res) => {
+  try {
+    const { id: userToChatId } = req.params;
+    const myId = req.user._id;  
+  
+    const messages = await Message.find({
+      $or: [
+        { senderID: myId, receiverID: userToChatId },
+        { senderID: userToChatId, receiverID: myId },  
+      ],
+    }).sort({ createdAt: 1 }); 
+
+    res.status(200).json(messages);
+  } catch (e) {
+    console.log("Messaging Server Error: ", e.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+  
+exports.sendMessage = async (req, res) => {
+  try {
+    const { message, image } = req.body;  
+    let { id: receiverID } = req.params;
+    const senderID = req.user._id;
+
+    receiverID = receiverID.trim(); 
+
+    let imageUrl = null;
+    if (image) {
+      const uploadResponse = await cloudinary.uploader.upload(image, {
+        width: 500,          
+        height: 500,
+        crop: 'scale',
+      });
+
+      console.log("Cloudinary response:", uploadResponse);  
+      imageUrl = uploadResponse.secure_url;  
+    }
+
+    const newMessage = new Message({
+      senderID,
+      receiverID,
+      content: message,
+      imageUrl: imageUrl, 
+    });
+
+    await newMessage.save();
+
+    const receiverSocketId = getReceiverSocketId(receiverID);
+    console.log(receiverSocketId)
+    if (receiverSocketId) {
+
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+      console.log(newMessage);
+    }
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    console.error("Error in sendMessage controller:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+

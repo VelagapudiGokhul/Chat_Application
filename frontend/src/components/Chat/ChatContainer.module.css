@@ -1,0 +1,33 @@
+.chatContainer {
+    overflow-y: auto;
+    height: 100%;
+  }
+  
+  .chatContainer::-webkit-scrollbar {
+    width: 8px; 
+  }
+  
+  .chatContainer::-webkit-scrollbar-thumb {
+    background-color: #5700c1; 
+    border-radius: 10px; 
+  }
+  
+  .chatContainer::-webkit-scrollbar-thumb:hover {
+    background-color: #7300ff; 
+  }
+  
+  .chatContainer::-webkit-scrollbar-track {
+    background-color: #f1f1f1; 
+    border-radius: 10px; 
+  }
+  
+  .userbtn:hover {
+    background-color: blue;
+    color: white;
+  }
+  
+  /* Active state when the user is selected */
+  .userbtn.active {
+    background-color: darkblue;  /* Change the background color when selected */
+    color: white;                /* Change text color when selected */
+  }
