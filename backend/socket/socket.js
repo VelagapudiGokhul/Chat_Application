@@ -31,6 +31,15 @@ io.on("connection", (socket) => {
 
   io.emit("getOnlineUsers", Object.keys(onlineusers));
 
+  socket.on("joinGroup", (groupId) => {
+    socket.join(`group_${groupId}`);
+    console.log(`Socket ${socket.id} joined group_${groupId}`);
+  });
+
+  socket.on("leaveGroup", (groupId) => {
+    socket.leave(`group_${groupId}`);
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected", socket.id);
     delete onlineusers[userId];

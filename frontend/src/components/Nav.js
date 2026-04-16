@@ -1,55 +1,66 @@
-import { Link, useNavigate } from "react-router-dom";
-import { LogOut, MessageSquare, Settings, User } from "lucide-react";
-import { useStore } from "zustand";  // Import Zustand store
-import AuthData from "./Hooks/AuthData";  // Update with the actual path to your Zustand store
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useStore } from "zustand";
+import AuthData from "./Hooks/AuthData";
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const { logout } = useStore(AuthData);  
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { logout } = useStore(AuthData);
 
-  const handleLogout = async () => {
-    await logout();  
-    navigate("/login");  
-  };
+    const hashParams = new URLSearchParams(location.search || window.location.hash.split('?')[1] || '');
+    const isGroupTab = hashParams.get('tab') === 'groups';
 
-  return (
-    <header className="bg-light border-bottom fixed-top w-100 shadow-sm" style={{ backdropFilter: 'blur(10px)' }}>
-      <div className="container-fluid px-4 py-2">
-        <div className="d-flex justify-content-between align-items-center">
-          {/* Logo Section */}
-          <div className="d-flex align-items-center gap-2">
-            <Link to="/" className="d-flex align-items-center text-decoration-none text-dark">
-              <div className="rounded-circle bg-primary p-2">
-                <MessageSquare className="w-20 h-20 text-white" />
-              </div>
-              <h1 className="h5 mb-0 ms-2">TChatter</h1>
-            </Link>
-          </div>
+    if (location.pathname === "/login" || location.pathname === "/signup") {
+        return null;
+    }
 
-          {/* Navbar Buttons (Settings, Profile, Logout) */}
-          <div className="d-flex align-items-center gap-3">
-            <Link to="/settings" className="btn btn-outline-secondary btn-sm d-flex align-items-center">
-              <Settings className="w-16 h-16" />
-              <span className="d-none d-sm-inline ms-2">Settings</span>
-            </Link>
+    const handleLogout = async () => {
+        await logout();
+        navigate("/login");
+    };
 
-            <Link to="/profile" className="btn btn-outline-secondary btn-sm d-flex align-items-center">
-              <User className="w-16 h-16" />
-              <span className="d-none d-sm-inline ms-2">Profile</span>
-            </Link>
-
-            <button
-              onClick={handleLogout}  
-              className="btn btn-outline-secondary btn-sm d-flex align-items-center"
-            >
-              <LogOut className="w-16 h-16" />
-              <span className="d-none d-sm-inline ms-2">Logout</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
+    return (
+        <aside className="h-full z-50 flex flex-col justify-between w-20 items-center py-8 rounded-2xl bg-surface-container-low shadow-[40px_0_40px_rgba(25,28,30,0.04)] relative flex-shrink-0">
+            <div className="flex flex-col items-center gap-8">
+                <Link to="/" className="text-2xl font-black text-primary tracking-tighter no-underline hover:opacity-80 transition-opacity" title="TChatter">
+                    TC
+                </Link>
+                <nav className="flex flex-col gap-4">
+                    <Link
+                        to="/?tab=chats"
+                        title="Chats"
+                        className={`p-3 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 flex no-underline ${!isGroupTab
+                                ? 'bg-surface-container-lowest text-primary shadow-sm'
+                                : 'text-outline hover:text-primary hover:bg-surface-container-lowest/50'
+                            }`}
+                    >
+                        <span className="material-symbols-outlined" data-icon="chat">chat</span>
+                    </Link>
+                    <Link
+                        to="/?tab=groups"
+                        title="Groups"
+                        className={`p-3 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 flex no-underline ${isGroupTab
+                                ? 'bg-surface-container-lowest text-primary shadow-sm'
+                                : 'text-outline hover:text-primary hover:bg-surface-container-lowest/50'
+                            }`}
+                    >
+                        <span className="material-symbols-outlined" data-icon="group">group</span>
+                    </Link>
+                </nav>
+            </div>
+            <div className="flex flex-col items-center gap-4">
+                <Link to="/settings" className="text-outline p-3 hover:text-primary hover:bg-surface-container-lowest/50 rounded-xl transition-all hover:scale-105 active:scale-95 flex no-underline" title="Settings">
+                    <span className="material-symbols-outlined" data-icon="settings">settings</span>
+                </Link>
+                <Link to="/profile" className="text-outline p-3 hover:text-primary hover:bg-surface-container-lowest/50 rounded-xl transition-all hover:scale-105 active:scale-95 flex no-underline" title="Profile">
+                    <span className="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+                </Link>
+                <button onClick={handleLogout} className="text-outline p-3 hover:text-error hover:bg-error-container/50 rounded-xl transition-all hover:scale-105 active:scale-95 flex border-none bg-transparent" title="Logout">
+                    <span className="material-symbols-outlined" data-icon="logout">logout</span>
+                </button>
+            </div>
+        </aside>
+    );
 };
 
 export default Navbar;

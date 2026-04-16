@@ -1,100 +1,97 @@
-import React, { useEffect } from 'react';
-import { Link, useNavigate } from "react-router-dom";
-import { Users, Settings, User, LogOut } from "lucide-react";
-import { useStore } from "zustand";
-import ChatData from '../Hooks/ChatData';
-import AuthData from '../Hooks/AuthData';
+import React, { useEffect, useState } from "react";
+import AuthData from "../Hooks/AuthData";
+import ChatData from "../Hooks/ChatData";
+import { Loader } from "lucide-react";
 
 const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = ChatData();
-  const { onlineUsers } = AuthData(); 
-  const navigate = useNavigate();
-  const { logout } = useStore(AuthData);
+    const { onlineUsers } = AuthData();
+    const {
+        users,
+        selectedUser,
+        setSelectedUser,
+        getUsers,
+        isUsersLoading,
+    } = ChatData();
 
-  useEffect(() => {
-    getUsers(); 
-  }, [getUsers]);
+    const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
-  const handleLogout = async () => {
-    await logout();  
-    navigate("/login");  
-  };
+    useEffect(() => {
+        getUsers();
+    }, [getUsers]);
 
-  if (isUsersLoading) return <div>Loading...</div>; 
+    const filteredUsers = showOnlineOnly
+        ? users.filter((user) => onlineUsers.includes(user._id))
+        : users;
 
-  return (
-    <div className="h-100 w-100 border-end p-3 d-flex flex-column" style={{ overflow: 'visible' }}>
-      
-      <div className="d-flex align-items-center gap-4 mb-2">
-        <Users className="fs-4" />
-        <span className="fw-semibold d-none d-lg-block">Contacts</span>
-        <div className="d-flex align-items-center ml-auto">
-          <div className="btn">
-            <Settings className="w-16 h-16" />
-          </div>
-          <div className="btn"> 
-            <User className="w-16 h-16" />
-          </div>
-          <button onClick={handleLogout} 
-            style={{
-              all: "unset"
-            }}
-          >
-            <div className="btn"> 
-              <LogOut className="w-16 h-16" />
-            </div>
-          </button>
-        </div>
-        <div style={{ borderTop: "1px solid #ffdfdd", marginTop: 'auto' }}></div>
-      </div>
-      
-
-      <div className="py-3 style={{ overflowY: 'auto'}}">
-        {users.map((user) => (
-          <button
-          key={user._id}
-          onClick={() => setSelectedUser(user)} 
-          className={`w-100 p-3 d-flex align-items-center gap-3 mb-2 border-0 rounded-3 
-            ${selectedUser?._id === user._id ? "text-white transform-scale-up" : "bg-white"}
-            hover:bg-light`}
-          style={{
-            backgroundColor: selectedUser?._id === user._id ? "#493D9E" : "",
-            transition: "all 0.3s ease-in-out", 
-            transform: selectedUser?._id === user._id ? "scale(1.2)" : "scale(1)", 
-            zIndex: selectedUser?._id === user._id ? 1 : "auto",
-            outline: 'none'
-          }}
-        >
-            <div className="position-relative">
-              <img
-                src={user.profilepic || "/avatar.png"}
-                alt={user.username}
-                className="rounded-circle img-fluid"
-                style={{ width: "48px", height: "48px", objectFit: "cover" }}
-              />
-              {onlineUsers.includes(user._id) && (
-                <span
-                  className="position-absolute bottom-0 end-0 bg-success rounded-circle border-2 border-light"
-                  style={{ width: "12px", height: "12px" }}
-                />
-              )}
-            </div>
-
-            <div className="d-flex flex-column ml-3">
-                <div className="fw-semibold text-truncate">{user.username}</div>
-                <div className="text-muted small" style={{ alignSelf: 'flex-start' }}>
-                  {onlineUsers && onlineUsers.includes(user._id) ? "Online" : "Offline"}
+    return (
+        <section className="w-80 flex flex-col bg-surface-container-lowest rounded-2xl shadow-[0_4px_20px_rgba(25,28,30,0.04)] overflow-hidden flex-shrink-0">
+            {/* Header + Actions */}
+            <div className="p-6 border-b border-outline-variant/15 flex-shrink-0">
+                <div className="flex items-center justify-between mb-4">
+                    <span className="font-bold text-on-surface text-base">Direct Messages</span>
+                    <span className="text-primary font-bold text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                        {onlineUsers.length > 0 ? onlineUsers.length - 1 : 0} Online
+                    </span>
                 </div>
-              </div>
-          </button>
-        ))}
+                
+                {/* Search */}
+                <div className="relative mb-4 group">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" data-icon="search" style={{ fontSize: '20px' }}>search</span>
+                    <input type="text" placeholder="Search contacts..." className="w-full bg-surface-container-low border-0 outline-none focus:ring-2 focus:ring-primary/20 rounded-xl py-2.5 pl-10 pr-4 text-sm text-on-surface transition-all placeholder:text-outline-variant" />
+                </div>
+            </div>
 
-        {users.length === 0 && (
-          <div className="text-center text-muted py-4">No users available</div>
-        )}
-      </div>
-    </div>
-  );
+            {/* Contacts List */}
+            <div className="flex-1 overflow-y-auto scrollbar-hide py-2">
+                {isUsersLoading ? (
+                    <div className="flex justify-center p-4">
+                        <Loader className="w-6 h-6 animate-spin text-primary" />
+                    </div>
+                ) : filteredUsers.length === 0 ? (
+                    <div className="text-center text-outline text-sm p-4">No contacts found.</div>
+                ) : (
+                    filteredUsers.map((user) => {
+                        const isOnline = onlineUsers.includes(user._id);
+                        const isSelected = selectedUser?._id === user._id;
+                        
+                        return (
+                            <div className="px-3 py-1" key={user._id}>
+                                <button
+                                    onClick={() => setSelectedUser(user)}
+                                    className={`w-full flex items-center gap-4 p-3 rounded-xl border-none outline-none text-left transition-all duration-200 ${
+                                        isSelected 
+                                        ? 'bg-primary-fixed/20 text-on-primary-fixed-variant scale-[1.02] shadow-sm' 
+                                        : 'hover:bg-surface-container-low text-on-surface bg-transparent'
+                                    }`}
+                                >
+                                    <div className="relative flex-shrink-0">
+                                        <img
+                                            src={user.profilepic || "/avatar.png"}
+                                            alt={user.username}
+                                            className="w-12 h-12 rounded-full object-cover border-2 border-surface-container-lowest shadow-sm"
+                                        />
+                                        {isOnline && (
+                                            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-surface-container-lowest rounded-full"></span>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-0.5">
+                                            <span className={`font-bold text-sm truncate ${isSelected ? 'text-primary' : 'text-on-surface'}`}>
+                                                {user.username}
+                                            </span>
+                                        </div>
+                                        <div className="text-xs text-outline flex items-center gap-1.5 truncate">
+                                            {isOnline ? 'Active now' : 'Offline'}
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        );
+                    })
+                )}
+            </div>
+        </section>
+    );
 };
 
 export default Sidebar;

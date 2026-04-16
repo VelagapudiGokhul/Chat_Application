@@ -5,14 +5,15 @@ const cookieParser = require("cookie-parser")
 const bodyParser = require('body-parser');
 const authRoute = require("./router/authRoute")
 const messageRoute = require("./router/messageRoute")
+const groupRoute = require("./router/groupRoute")
 
 const { io, app, server } = require("./socket/socket");
 
 dotenv.config()
 
 
-app.use(bodyParser.json({ limit: '1mb' }));  
-app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));  
+app.use(bodyParser.json({ limit: '50mb' }));  
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));  
 
 app.use(cookieParser());
 app.use(express.json());
@@ -30,6 +31,7 @@ app.use(cors(corsOptions));
 
 app.use('/api/authRoute', authRoute);
 app.use('/api/messageRoute', messageRoute);
+app.use('/api/groupRoute', groupRoute);
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {

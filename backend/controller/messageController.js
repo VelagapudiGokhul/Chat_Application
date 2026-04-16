@@ -37,7 +37,7 @@ exports.getMessages = async (req, res) => {
 
 exports.sendMessage = async (req, res) => {
   try {
-    const { message, image } = req.body;  
+    const { message, image, audio } = req.body;  
     let { id: receiverID } = req.params;
     const senderID = req.user._id;
 
@@ -72,12 +72,24 @@ exports.sendMessage = async (req, res) => {
       imageUrl = uploadResponse.secure_url;  
     }
 
-    // 4. Save message with optional toxicity flag
+    // 4. Upload audio if present
+    let audioUrl = null;
+    if (audio) {
+      const uploadResponse = await cloudinary.uploader.upload(audio, {
+        resource_type: 'video',
+        folder: 'voice_messages',
+      });
+      console.log("Cloudinary audio response:", uploadResponse);
+      audioUrl = uploadResponse.secure_url;
+    }
+
+    // 5. Save message with optional toxicity flag
     const newMessage = new Message({
       senderID,
       receiverID,
       content: message,
       imageUrl: imageUrl,
+      audioUrl: audioUrl,
       toxicity: toxicityPrediction,   // Save prediction if your schema supports it
     });
 

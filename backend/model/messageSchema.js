@@ -5,7 +5,8 @@ const messageSchema=new mongoose.Schema({
     receiverID:{ type:mongoose.Schema.Types.ObjectId, ref: 'User', required:true},
     content:{ type:String },
     imageUrl: { type: String },
-    mediaUrl: { type: String }
+    mediaUrl: { type: String },
+    audioUrl: { type: String }
 },
 { versionKey: false,
   timestamps: true
