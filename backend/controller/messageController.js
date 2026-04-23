@@ -3,6 +3,8 @@ const Message = require('../model/messageSchema');
 const cloudinary = require('../config/cloudinary');
 const { getReceiverSocketId, io } = require("../socket/socket");
 const axios = require('axios');
+const { isSwiggyBot } = require("../utils/botSetup");
+const { handleSwiggyBotMessage } = require("./swiggyController");
 
 exports.allUsers = async (req, res) => {
     try {
@@ -42,6 +44,29 @@ exports.sendMessage = async (req, res) => {
     const senderID = req.user._id;
 
     receiverID = receiverID.trim(); 
+
+    // ── Check if receiver is the Swiggy Bot ──
+    const isBotReceiver = await isSwiggyBot(receiverID);
+
+    if (isBotReceiver) {
+      // Save the user's message to the bot first
+      const userMessage = new Message({
+        senderID,
+        receiverID,
+        content: message,
+        imageUrl: null,
+        audioUrl: null,
+      });
+      await userMessage.save();
+
+      // Process through Ollama + Swiggy MCP (async — bot reply is emitted via socket)
+      const botResult = await handleSwiggyBotMessage(senderID, message || "Hi!");
+
+      // Return the user's saved message
+      return res.status(201).json(userMessage);
+    }
+
+    // ── Normal message flow for regular users ──
 
     // 1. Call Python toxicity API
     let toxicityPrediction = {};

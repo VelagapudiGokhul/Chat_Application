@@ -53,6 +53,7 @@ const Sidebar = () => {
                     filteredUsers.map((user) => {
                         const isOnline = onlineUsers.includes(user._id);
                         const isSelected = selectedUser?._id === user._id;
+                        const isBot = user.isBot;
                         
                         return (
                             <div className="px-3 py-1" key={user._id}>
@@ -65,23 +66,36 @@ const Sidebar = () => {
                                     }`}
                                 >
                                     <div className="relative flex-shrink-0">
-                                        <img
-                                            src={user.profilepic || "/avatar.png"}
-                                            alt={user.username}
-                                            className="w-12 h-12 rounded-full object-cover border-2 border-surface-container-lowest shadow-sm"
-                                        />
-                                        {isOnline && (
-                                            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-surface-container-lowest rounded-full"></span>
+                                        {isBot ? (
+                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-xl shadow-md border-2 border-surface-container-lowest">
+                                                🍕
+                                            </div>
+                                        ) : (
+                                            <img
+                                                src={user.profilepic || "/avatar.png"}
+                                                alt={user.username}
+                                                className="w-12 h-12 rounded-full object-cover border-2 border-surface-container-lowest shadow-sm"
+                                            />
                                         )}
+                                        {isBot ? (
+                                            <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-orange-500 border-2 border-surface-container-lowest rounded-full flex items-center justify-center text-[8px]">🤖</span>
+                                        ) : isOnline ? (
+                                            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-surface-container-lowest rounded-full"></span>
+                                        ) : null}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between mb-0.5">
                                             <span className={`font-bold text-sm truncate ${isSelected ? 'text-primary' : 'text-on-surface'}`}>
                                                 {user.username}
                                             </span>
+                                            {isBot && (
+                                                <span className="text-[9px] font-bold bg-orange-500/15 text-orange-600 px-1.5 py-0.5 rounded-full uppercase tracking-wider">AI</span>
+                                            )}
                                         </div>
                                         <div className="text-xs text-outline flex items-center gap-1.5 truncate">
-                                            {isOnline ? 'Active now' : 'Offline'}
+                                            {isBot ? (
+                                                <span className="text-orange-500 font-medium">AI Assistant • Swiggy</span>
+                                            ) : isOnline ? 'Active now' : 'Offline'}
                                         </div>
                                     </div>
                                 </button>

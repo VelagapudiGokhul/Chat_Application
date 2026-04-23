@@ -1,0 +1,1074 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "get_addresses",
+      "description": "Swiggy (Instamart/Food): Get all saved delivery addresses for the authenticated Swiggy user, sorted by last order date. ",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "create_address",
+      "description": "Swiggy (Instamart/Food): Create a new delivery address for the authenticated user.\n\n📍 WORKFLOW - What to ASK the user:\n",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "fullAddress": {
+            "type": "string",
+            "description": "Complete address as provided by the user"
+          },
+          "addressLine": {
+            "type": "string",
+            "description": "Main street/building/house number (REQUIRED)"
+          },
+          "addressLine2": {
+            "type": "string"
+          },
+          "locality": {
+            "type": "string",
+            "description": "Area, neighborhood, or locality name (optional)"
+          },
+          "city": {
+            "type": "string",
+            "description": "City name (REQUIRED)"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal/ZIP code (REQUIRED)"
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Latitude coordinate of the address (REQUIRED) (numeric value)"
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Longitude coordinate of the address (REQUIRED) (numeric value)"
+          },
+          "addressCategory": {
+            "type": "string",
+            "description": "Type of address: HOME, WORK, OFFICE, FRIENDS_AND_FAMILY, or OTHER (REQUIRED)",
+            "enum": [
+              "HOME",
+              "WORK",
+              "OFFICE",
+              "FRIENDS_AND_FAMILY",
+              "OTHER"
+            ]
+          },
+          "addressTag": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string",
+            "description": "Account holder name (authenticated user) (REQUIRED)"
+          },
+          "userPhone": {
+            "type": "string",
+            "description": "Account holder phone number (authenticated user) (REQUIRED)"
+          },
+          "receiverName": {
+            "type": "string",
+            "description": "Receiver name if delivering to someone else (optional)"
+          },
+          "receiverPhone": {
+            "type": "string",
+            "description": "Receiver phone if delivering to someone else (optional)"
+          }
+        },
+        "required": [
+          "fullAddress",
+          "addressLine",
+          "addressLine2",
+          "city",
+          "postalCode",
+          "latitude",
+          "longitude",
+          "addressCategory",
+          "userName",
+          "userPhone"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "delete_address",
+      "description": "Swiggy (Instamart/Food): Delete a saved delivery address for the authenticated user.\n\n📍 WORKFLOW:\n1. First call get_add",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string",
+            "description": "The ID of the address to delete (from get_addresses response)"
+          }
+        },
+        "required": [
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "search_restaurants",
+      "description": "Search and order food from restaurants for delivery. PRIMARY FOOD DELIVERY SERVICE - Use this when user wants to order f",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "string",
+            "description": "Pagination offset. Use nextOffset from previous re (numeric value)",
+            "default": 0
+          }
+        },
+        "required": [
+          "addressId",
+          "query"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "search_menu",
+      "description": "Search for dishes and menu items to order for food delivery. PRIMARY FOOD DELIVERY SERVICE - Use this when user wants to",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "restaurantIdOfAddedItem": {
+            "type": "string",
+            "description": "Optional restaurant ID to scope search"
+          },
+          "vegFilter": {
+            "type": "string",
+            "description": "Veg filter flag (0 or 1). Pass 1 for veg-only item (numeric value)"
+          },
+          "offset": {
+            "type": "string",
+            "description": "Pagination offset. Use nextOffset from previous re (numeric value)",
+            "default": 0
+          }
+        },
+        "required": [
+          "addressId",
+          "query"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_restaurant_menu",
+      "description": "Get the complete menu of a restaurant, paginated by category. Use this to BROWSE a restaurant menu and see what is avail",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string",
+            "description": "Address ID from get_addresses tool"
+          },
+          "restaurantId": {
+            "type": "string",
+            "description": "Restaurant ID to fetch menu for (from search_restaurants)"
+          },
+          "page": {
+            "type": "string",
+            "description": "Page number for pagination (default: 1) (numeric value)",
+            "default": 1
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "Number of categories per page (default: 5, max: 8) (numeric value)",
+            "default": 5
+          }
+        },
+        "required": [
+          "addressId",
+          "restaurantId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_food_cart",
+      "description": "Get current food delivery cart with all items. PRIMARY FOOD DELIVERY SERVICE - Use this to view cart contents when order",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string",
+            "description": "Address ID to get accurate delivery charges based on location."
+          },
+          "restaurantName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "update_food_cart",
+      "description": "Add items to food delivery cart or update cart contents. PRIMARY FOOD DELIVERY SERVICE - Use this when user wants to add",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "restaurantId": {
+            "type": "string",
+            "description": "Restaurant ID for the cart"
+          },
+          "cartItems": {
+            "type": "array",
+            "description": "Array of items to add to cart with their customizations"
+          },
+          "addressId": {
+            "type": "string",
+            "description": "Address ID to get accurate delivery charges based on location."
+          },
+          "restaurantName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "restaurantId",
+          "cartItems",
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "flush_food_cart",
+      "description": "Clear or empty the food delivery cart. PRIMARY FOOD DELIVERY SERVICE - Use this to remove all items from the food delive",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "place_food_order",
+      "description": "Place food delivery order and confirm order placement. PRIMARY FOOD DELIVERY SERVICE - Use this when user wants to place",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string"
+          },
+          "paymentMethod": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "fetch_food_coupons",
+      "description": "Get available coupons and offers for food delivery order. PRIMARY FOOD DELIVERY SERVICE - Use this to find discounts, co",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "restaurantId": {
+            "type": "string",
+            "description": "Restaurant ID for the cart"
+          },
+          "addressId": {
+            "type": "string"
+          },
+          "couponCode": {
+            "type": "string",
+            "description": "Optional coupon code to check applicability of a specific coupon"
+          }
+        },
+        "required": [
+          "restaurantId",
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "apply_food_coupon",
+      "description": "Apply coupon code or discount to food delivery order. PRIMARY FOOD DELIVERY SERVICE - Use this when user wants to apply ",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "couponCode": {
+            "type": "string",
+            "description": "Coupon code to apply"
+          },
+          "addressId": {
+            "type": "string"
+          },
+          "cartId": {
+            "type": "string",
+            "description": "Optional cart ID"
+          }
+        },
+        "required": [
+          "couponCode",
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_food_orders",
+      "description": "Get active food delivery orders and order status. PRIMARY FOOD DELIVERY SERVICE - Use this when user asks about their or",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "orderCount": {
+            "type": "string",
+            "description": "Number of orders to fetch (default: 5, max: 20) (numeric value)",
+            "default": 5
+          },
+          "addressId": {
+            "type": "string",
+            "description": "Address ID to use for fetching orders (can be obtained from get_addresses)"
+          }
+        },
+        "required": [
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_food_order_details",
+      "description": "Get detailed information about a specific food delivery order. PRIMARY FOOD DELIVERY SERVICE - Use this when user asks a",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Order ID to fetch details for (can be obtained from get_food_orders)"
+          }
+        },
+        "required": [
+          "orderId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "track_food_order",
+      "description": "Track food delivery order status and delivery progress. PRIMARY FOOD DELIVERY SERVICE - Use this when user asks to track",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "report_error",
+      "description": "Generate an error report to share with the Swiggy MCP team. Use this when the user encounters an error and wants to repo",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "The error message the user saw"
+          },
+          "flowDescription": {
+            "type": "string"
+          },
+          "toolContext": {
+            "type": "object"
+          },
+          "userNotes": {
+            "type": "string",
+            "description": "Any additional notes or context the user wants to share"
+          }
+        },
+        "required": [
+          "tool",
+          "errorMessage"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_addresses",
+      "description": "Swiggy (Instamart/Food): Get all saved delivery addresses for the authenticated Swiggy user, sorted by last order date. ",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "create_address",
+      "description": "Swiggy (Instamart/Food): Create a new delivery address for the authenticated user.\n\n📍 WORKFLOW - What to ASK the user:\n",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "fullAddress": {
+            "type": "string",
+            "description": "Complete address as provided by the user"
+          },
+          "addressLine": {
+            "type": "string",
+            "description": "Main street/building/house number (REQUIRED)"
+          },
+          "addressLine2": {
+            "type": "string"
+          },
+          "locality": {
+            "type": "string",
+            "description": "Area, neighborhood, or locality name (optional)"
+          },
+          "city": {
+            "type": "string",
+            "description": "City name (REQUIRED)"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal/ZIP code (REQUIRED)"
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Latitude coordinate of the address (REQUIRED) (numeric value)"
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Longitude coordinate of the address (REQUIRED) (numeric value)"
+          },
+          "addressCategory": {
+            "type": "string",
+            "description": "Type of address: HOME, WORK, OFFICE, FRIENDS_AND_FAMILY, or OTHER (REQUIRED)",
+            "enum": [
+              "HOME",
+              "WORK",
+              "OFFICE",
+              "FRIENDS_AND_FAMILY",
+              "OTHER"
+            ]
+          },
+          "addressTag": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string",
+            "description": "Account holder name (authenticated user) (REQUIRED)"
+          },
+          "userPhone": {
+            "type": "string",
+            "description": "Account holder phone number (authenticated user) (REQUIRED)"
+          },
+          "receiverName": {
+            "type": "string",
+            "description": "Receiver name if delivering to someone else (optional)"
+          },
+          "receiverPhone": {
+            "type": "string",
+            "description": "Receiver phone if delivering to someone else (optional)"
+          }
+        },
+        "required": [
+          "fullAddress",
+          "addressLine",
+          "addressLine2",
+          "city",
+          "postalCode",
+          "latitude",
+          "longitude",
+          "addressCategory",
+          "userName",
+          "userPhone"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "delete_address",
+      "description": "Swiggy (Instamart/Food): Delete a saved delivery address for the authenticated user.\n\n📍 WORKFLOW:\n1. First call get_add",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string",
+            "description": "The ID of the address to delete (from get_addresses response)"
+          }
+        },
+        "required": [
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "search_products",
+      "description": "Search for products available at the selected address. Returns products with their variants (e.g., different pack sizes,",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string",
+            "description": "REQUIRED: Search query (product name, category, or brand). Cannot be empty."
+          },
+          "offset": {
+            "type": "string",
+            "description": "Pagination offset (default: 0) (numeric value)"
+          }
+        },
+        "required": [
+          "addressId",
+          "query"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "your_go_to_items",
+      "description": "Fetch the user's Your Go To Items (frequently or recently ordered items) for the selected delivery address. Use addressI",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string",
+            "description": "Address ID from get_addresses tool"
+          },
+          "offset": {
+            "type": "string",
+            "description": "Pagination offset (default: 0) (numeric value)"
+          }
+        },
+        "required": [
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_cart",
+      "description": "Swiggy Instamart (Grocery): Get current Swiggy Instamart grocery cart with all items and bill breakdown. Use this for In",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "update_cart",
+      "description": "Swiggy Instamart (Grocery): Update Swiggy Instamart grocery cart with items. Replaces entire cart with the provided item",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "selectedAddressId": {
+            "type": "string",
+            "description": "Selected delivery address ID from get_addresses tool"
+          },
+          "items": {
+            "type": "array",
+            "description": "Array of items to add to cart"
+          }
+        },
+        "required": [
+          "selectedAddressId",
+          "items"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "clear_cart",
+      "description": "Clear (remove all items from) the Instamart cart. Authentication is handled automatically.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "checkout",
+      "description": "Swiggy Instamart (Grocery): Place and confirm Swiggy Instamart grocery order. Creates order and confirms payment in a si",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string",
+            "description": "Delivery address ID (from get_addresses - user must have selected this address)"
+          },
+          "paymentMethod": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "addressId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_orders",
+      "description": "Swiggy Instamart order history - Use this to fetch ORDER HISTORY, past orders, or order preferences. Use this FIRST when",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "string",
+            "description": "Number of orders to fetch (default: 10, max recomm (numeric value)"
+          },
+          "orderType": {
+            "type": "string",
+            "description": "Order type filter (e.g., \"DASH\", \"INSTAMART\"). Default: \"DASH\""
+          },
+          "activeOnly": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_order_details",
+      "description": "Get detailed information for a specific Swiggy Instamart order by order ID. Use this when the user wants to see complete",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "orderId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "track_order",
+      "description": "Track Swiggy Instamart order status in real-time. PRIMARY TOOL for order tracking - Use this FIRST when user asks: \"wher",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "The order ID to track (required). Can be obtained from get_orders tool."
+          },
+          "lat": {
+            "type": "string",
+            "description": "Latitude of the delivery address (required for acc (numeric value)"
+          },
+          "lng": {
+            "type": "string",
+            "description": "Longitude of the delivery address (required for ac (numeric value)"
+          }
+        },
+        "required": [
+          "orderId",
+          "lat",
+          "lng"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "report_error",
+      "description": "Generate an error report to share with the Swiggy MCP team. Use this when the user encounters an error and wants to repo",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "The error message the user saw"
+          },
+          "flowDescription": {
+            "type": "string"
+          },
+          "toolContext": {
+            "type": "object"
+          },
+          "userNotes": {
+            "type": "string",
+            "description": "Any additional notes or context the user wants to share"
+          }
+        },
+        "required": [
+          "tool",
+          "errorMessage"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_saved_locations",
+      "description": "Swiggy Dineout (Reservations): Get user's saved addresses for restaurant search. NOT for food delivery or grocery orders",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "search_restaurants_dineout",
+      "description": "Swiggy Dineout (Reservations): Search restaurants for TABLE BOOKING/RESERVATIONS. Use when user wants to GO OUT and book",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string",
+            "enum": [
+              "locality",
+              "CUISINE",
+              "RESTAURANT_CATEGORY"
+            ]
+          },
+          "addressId": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Latitude for search. Use for direct city/area sear (numeric value)"
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Longitude for search. Use for direct city/area sea (numeric value)"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_restaurant_details",
+      "description": "Swiggy Dineout (Reservations): Get details about a specific restaurant for TABLE BOOKING. NOT for food delivery or groce",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "restaurantId": {
+            "type": "string",
+            "description": "Restaurant ID from search results"
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Latitude (use same as search) (numeric value)"
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Longitude (use same as search) (numeric value)"
+          }
+        },
+        "required": [
+          "restaurantId",
+          "latitude",
+          "longitude"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_available_slots",
+      "description": "Swiggy Dineout (Reservations): Check available time slots for TABLE BOOKING at a restaurant. NOT for food delivery or gr",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "restaurantId": {
+            "type": "string",
+            "description": "Restaurant ID from search or details"
+          },
+          "date": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "string",
+            "description": "User's latitude (numeric value)"
+          },
+          "longitude": {
+            "type": "string",
+            "description": "User's longitude (numeric value)"
+          }
+        },
+        "required": [
+          "restaurantId",
+          "date",
+          "latitude",
+          "longitude"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "book_table",
+      "description": "Swiggy Dineout (Reservations): Book a table at a restaurant for a specific time slot. NOT for food delivery or grocery o",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "restaurantId": {
+            "type": "string",
+            "description": "Restaurant ID"
+          },
+          "slotId": {
+            "type": "string",
+            "description": "Slot ID from selected slot (slot.deals[].slotId) (numeric value)"
+          },
+          "itemId": {
+            "type": "string",
+            "description": "Deal/ticket item ID (slot.deals[].itemId, format: \"restaurantId-ticketId\")"
+          },
+          "reservationTime": {
+            "type": "string",
+            "description": "Unix timestamp from selected slot (slot.reservatio (numeric value)"
+          },
+          "guestCount": {
+            "type": "string",
+            "description": "Number of guests (1-20) (numeric value)"
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Latitude from user address (numeric value)"
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Longitude from user address (numeric value)"
+          },
+          "tidOverride": {
+            "type": "string",
+            "description": "Optional: Override transaction ID (tid) from auth context"
+          }
+        },
+        "required": [
+          "restaurantId",
+          "slotId",
+          "itemId",
+          "reservationTime",
+          "guestCount",
+          "latitude",
+          "longitude"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "create_cart",
+      "description": "Swiggy Dineout (Reservations): Low-level cart primitive. NOT for food delivery or grocery orders. DO NOT call this for \"",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "restaurantId": {
+            "type": "string",
+            "description": "Restaurant ID"
+          },
+          "cartType": {
+            "type": "string",
+            "description": "Cart type: DEAL_TICKET_PURCHASE for booking, DINEOUT for bill payment",
+            "enum": [
+              "DEAL_TICKET_PURCHASE",
+              "DINEOUT"
+            ]
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Latitude (numeric value)"
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Longitude (numeric value)"
+          },
+          "slotId": {
+            "type": "string",
+            "description": "Slot ID (required for booking cart) (numeric value)"
+          },
+          "itemId": {
+            "type": "string",
+            "description": "Item ID (required for booking cart, format: \"restaurantId-ticketId\")"
+          },
+          "reservationTime": {
+            "type": "string",
+            "description": "Unix timestamp (required for booking cart) (numeric value)"
+          },
+          "guestCount": {
+            "type": "string",
+            "description": "Number of guests (required for booking cart, 1-20) (numeric value)"
+          },
+          "billAmount": {
+            "type": "string",
+            "description": "Bill amount in rupees (required for bill payment c (numeric value)"
+          },
+          "source": {
+            "type": "string",
+            "description": "Source for bill payment cart (default: \"direct-payment-cart\")"
+          }
+        },
+        "required": [
+          "restaurantId",
+          "cartType",
+          "latitude",
+          "longitude"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_booking_status",
+      "description": "Swiggy Dineout (Reservations): Get booking status and details for a dineout reservation. NOT for food delivery or grocer",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Order ID from booking confirmation"
+          }
+        },
+        "required": [
+          "orderId"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "report_error",
+      "description": "Generate an error report to share with the Swiggy MCP team. Use this when the user encounters an error and wants to repo",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "The error message the user saw"
+          },
+          "flowDescription": {
+            "type": "string"
+          },
+          "toolContext": {
+            "type": "object"
+          },
+          "userNotes": {
+            "type": "string",
+            "description": "Any additional notes or context the user wants to share"
+          }
+        },
+        "required": [
+          "tool",
+          "errorMessage"
+        ]
+      }
+    }
+  }
+]

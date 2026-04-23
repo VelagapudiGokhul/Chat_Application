@@ -6,8 +6,10 @@ const bodyParser = require('body-parser');
 const authRoute = require("./router/authRoute")
 const messageRoute = require("./router/messageRoute")
 const groupRoute = require("./router/groupRoute")
+const swiggyRoute = require("./router/swiggyRoute")
 
 const { io, app, server } = require("./socket/socket");
+const { ensureSwiggyBotUser } = require("./utils/botSetup");
 
 dotenv.config()
 
@@ -32,10 +34,15 @@ app.use(cors(corsOptions));
 app.use('/api/authRoute', authRoute);
 app.use('/api/messageRoute', messageRoute);
 app.use('/api/groupRoute', groupRoute);
+app.use('/api/swiggyRoute', swiggyRoute);
 
 mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
+    .then(async () => {
         console.log("Connected to MongoDB");
+
+        // Initialize Swiggy Bot user after DB connection
+        await ensureSwiggyBotUser();
+        console.log("✅ Server ready — Swiggy MCP auth is per-user");
     })
     .catch((err) => {
         console.error("MongoDB connection error:", err);
@@ -44,3 +51,4 @@ mongoose.connect(process.env.MONGODB_URI)
 server.listen(process.env.PORT,()=>{
     console.log("Server is running in the port:" + process.env.PORT);
 })
+
